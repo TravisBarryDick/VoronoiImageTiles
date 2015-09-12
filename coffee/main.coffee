@@ -1,5 +1,3 @@
-# The js/ folder is not tracked by git since it is the compiler output. In order
-# to track the library files,
 require.config {
   paths:
     "domReady": ["https://cdnjs.cloudflare.com/ajax/libs/require-domReady/2.0.1/domReady.min"

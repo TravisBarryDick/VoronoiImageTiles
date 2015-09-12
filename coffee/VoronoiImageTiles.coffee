@@ -1,4 +1,4 @@
-define ["AliasMethod", "RandUtils", "KDTree"], (AliasTable, ru, kdt) ->
+define ["AliasMethod", "RandUtils", "KDTree"], (am, ru, kdt) ->
   class Image
     constructor: (@width, @height, @data = (0 for i in [1..@width * @height])) ->
     # Converts an (x,y) pair into an index into the data array
@@ -79,7 +79,7 @@ define ["AliasMethod", "RandUtils", "KDTree"], (AliasTable, ru, kdt) ->
 
   sample_points = (weight_img, n) ->
     N = weight_img.data.length
-    alias_table = new AliasTable weight_img.data
+    alias_table = am.make_alias_table weight_img.data
     sample_ixs = (alias_table.sample() for i in [1..n])
     sample_pts = (weight_img.ix2c(ix) for ix in sample_ixs)
     return sample_pts
