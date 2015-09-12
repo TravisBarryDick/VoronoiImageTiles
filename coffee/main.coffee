@@ -4,18 +4,43 @@ require.config {
                  "../lib/domReady"]
 }
 
-require ["RandUtils", "KDTree", "AliasMethod", "VoronoiImageTiles", "domReady"],\
-        (ru, kdt, AliasTable, vit, domReady) ->
-  window.ru = ru
-  window.kdt = kdt
-  window.AliasTable = AliasTable
-  window.vit = vit
+require ["ImageUtils"
+         "VoronoiImageTiles"
+         "domReady"], \
+         (iu, vit, domReady) ->
 
-  load_image = ->
+  # Sets the sourceimage element's src attribute to a data url obtained by
+  # reading the file selected by the fileselector element.
+  load_selected_image = ->
     fr = new FileReader()
     fr.onload = ->
       document.getElementById("sourceimage").src = fr.result
     fr.readAsDataURL(document.getElementById("fileselector").files[0])
+
+  # Renders the tiled image using the content of the sourceimage element.
+  # Updates other dom elements.
+  make_tiled_image = ->
+    simg_element = document.getElementById("sourceimage")
+    dimg_element = document.getElementById("distimage")
+    rimg_element = document.getElementById("resultimage")
+    kdtreegraph_element = document.getElementById("kdtreegraph")
+    numsamples = document.getElementById("numsamples").value
+
+    # render the tiled image
+    simg = iu.convert_image_element simg_element
+    dist = vit.gradient_dist simg
+    result = vit.render_tiled_image simg, dist, numsamples
+
+    # show the distribution
+    dimg_element.src = iu.image_to_dataurl iu.grayscale_to_rgb iu.rescale_to_255 result.dist
+
+    # Draw the k-d tree
+    kdtreegraph.width = result.out.width
+    kdtreegraph.height = result.out.height
+    result.kdtree.draw_on_canvas(kdtreegraph_element)
+
+    # Draw the tiled image
+    rimg_element.src = iu.image_to_dataurl result.out
 
   get_clamped_size = (w,h, mw=800, mh=600) ->
     w_scale = mw / w
@@ -26,32 +51,8 @@ require ["RandUtils", "KDTree", "AliasMethod", "VoronoiImageTiles", "domReady"],
     else
       return [w*scale, h*scale]
 
-  get_image_data = (img) ->
-    cvs = document.createElement("canvas")
-    [w, h] = get_clamped_size(img.naturalWidth, img.naturalHeight)
-    cvs.width = w
-    cvs.height = h
-    ctx = cvs.getContext("2d")
-    ctx.drawImage(img, 0, 0, w, h)
-    return vit.imagedata_to_image ctx.getImageData(0, 0, w, h)
-
   domReady ->
     fs = document.getElementById("fileselector")
-    fs.onchange = (e) ->
-      load_image()
-
-    make_image = =>
-      source_img = get_image_data(document.getElementById("sourceimage"))
-      num_samples = document.getElementById("numsamples").value
-      samples = vit.gradient_sample source_img, num_samples
-      tree = kdt.make_kdtree(samples)
-      result_img = vit.render_tiled_image(source_img, samples)
-      document.getElementById("resultimage").src = vit.image_to_dataurl(result_img)
-
-      kdtreegraph = document.getElementById("kdtreegraph")
-      kdtreegraph.width = source_img.width
-      kdtreegraph.height = source_img.height
-      tree.draw_on_canvas(kdtreegraph)
-
-    document.getElementById("sourceimage").onload = -> setTimeout(make_image, 0)
-    document.getElementById("run_button").onclick = -> setTimeout(make_image, 0)
+    fs.onchange = (e) -> load_selected_image()
+    document.getElementById("sourceimage").onload = -> setTimeout(make_tiled_image, 0)
+    document.getElementById("run_button").onclick = -> setTimeout(make_tiled_image, 0)
