@@ -42,7 +42,7 @@ define ->
     return rgb
 
   # Given a grayscale image, rescales everything so that the maximum value is
-  # 255
+  # 255.
   rescale_to_255 = (gsimg) ->
     max_g = 0
     for g in gsimg.data
@@ -51,6 +51,25 @@ define ->
     result = new Image gsimg.width, gsimg.height
     result.data = (g * scale for g in gsimg.data)
     return result
+
+  # Convolves a grayscale image with the given kernel.
+  img_filter = (gsimg, kernel) ->
+    [w,h] = [kernel.length, kernel[0].length]
+    result = new Image gsimg.width, gsimg.height
+    for x in [0...gsimg.width]
+      for y in [0...gsimg.height]
+        g = 0.0
+        for dx in [-(w // 2)..(w // 2)]
+          for dy in [-(h // 2)..(h // 2)]
+            if 0 <= x+dx < gsimg.width and 0 <= y+dy < gsimg.height
+              g += kernel[dx+(w // 2)][dy+(h // 2)] * gsimg.get(x+dx, y+dy)
+        result.set(x,y,g)
+    return result
+
+  box_smooth = (gsimg, size) ->
+    s = 1.0 / (size*size)
+    kernel = ((s for i in [1..size]) for j in [1..size])
+    return img_filter gsimg, kernel
 
   # Takes a grayscale image and returns the image intensity derivative with
   # respect to the x coordinate
@@ -133,6 +152,8 @@ define ->
     rgb_to_grayscale: rgb_to_grayscale
     grayscale_to_rgb: grayscale_to_rgb
     rescale_to_255: rescale_to_255
+    img_filter: img_filter
+    box_smooth: box_smooth
     img_gradx: img_gradx
     img_grady: img_grady
     img_gradm: img_gradm

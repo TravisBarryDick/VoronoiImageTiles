@@ -16,15 +16,11 @@ define ["ImageUtils", "AliasMethod", "RandUtils", "KDTree"], (iu, am, ru, kdt) -
   # Creates a distribution to sample from that is obtained by computing the
   # magnitude of the image intensity gradient and mixing with the uniform
   # distribution.
-  gradient_dist = (img, uniform_mix=0.1) ->
+  gradient_dist = (img, edge_sensitivity = 20, min_v = 0.005) ->
     gsimg = iu.rgb_to_grayscale img
     gradm = iu.img_gradm gsimg
-    total_gm = 0
-    for g in gradm.data
-      total_gm += g
-    uniform_p = 1.0 / img.data.length
-    gradm.data = ((1-uniform_mix)*g / total_gm + uniform_mix*uniform_p\
-                 for g in gradm.data)
+    gradm.data = ((Math.tanh((g-123)/255*edge_sensitivity) + 1)/2 + min_v for g in gradm.data)
+    gradm = iu.box_smooth gradm, 7
     return gradm
 
   # Given an image, a distribution, and a number of samples, render the tiled
@@ -35,8 +31,8 @@ define ["ImageUtils", "AliasMethod", "RandUtils", "KDTree"], (iu, am, ru, kdt) -
     kdtree = kdt.make_kdtree(samples)
     # Compute the mean color in each Voronoi tile. (Note that it's a bit silly
     # to do this in RGB space. Should convert to XYZ before avaraging.)
-    total_colors = (new iu.RGB 0,0,0 for s in samples)
-    counts = (0 for s in samples)
+    total_colors = (img.get(s[0], s[1]) for s in samples)
+    counts = (1 for s in samples)
     for ix in [0...img.data.length]
       [nn_p, nn_ix, nn_d] = kdtree.nns(img.ix2c(ix))
       total_colors[nn_ix] = total_colors[nn_ix].add(img.data[ix])

@@ -24,11 +24,13 @@ require ["ImageUtils"
     dimg_element = document.getElementById("distimage")
     rimg_element = document.getElementById("resultimage")
     kdtreegraph_element = document.getElementById("kdtreegraph")
-    numsamples = document.getElementById("numsamples").value
+    numsamples = Math.floor(document.getElementById("numsamples").value)
+    edge_sensitivity = Number(document.getElementById("edgesensitivity").value)
+    uniform_bias = Number(document.getElementById("uniformbias").value)
 
     # render the tiled image
     simg = iu.convert_image_element simg_element
-    dist = vit.gradient_dist simg
+    dist = vit.gradient_dist simg, edge_sensitivity, uniform_bias
     result = vit.render_tiled_image simg, dist, numsamples
 
     # show the distribution
