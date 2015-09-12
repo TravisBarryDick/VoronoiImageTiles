@@ -109,7 +109,7 @@ define ->
 
   # takes an HTML image element and returns an instance of the above image class
   convert_image_element = (imgelement, scale = 1.0) ->
-    [w, h] = [imgelement.width*scale, imgelement.height*scale]
+    [w, h] = [Math.floor(imgelement.naturalWidth*scale), Math.floor(imgelement.naturalHeight*scale)]
     c = document.createElement("canvas")
     [c.width, c.height] = [w, h]
     ctx = c.getContext("2d")

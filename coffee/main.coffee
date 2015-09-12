@@ -17,6 +17,11 @@ require ["ImageUtils"
       document.getElementById("sourceimage").src = fr.result
     fr.readAsDataURL(document.getElementById("fileselector").files[0])
 
+  get_clamping_scale = (w, h, mw=800, mh=600) ->
+    wscale = mw / w
+    hscale = mh / h
+    return Math.min(wscale, hscale, 1.0)
+
   # Renders the tiled image using the content of the sourceimage element.
   # Updates other dom elements.
   make_tiled_image = ->
@@ -29,7 +34,9 @@ require ["ImageUtils"
     uniform_bias = Number(document.getElementById("uniformbias").value)
 
     # render the tiled image
-    simg = iu.convert_image_element simg_element
+    scale = get_clamping_scale simg_element.naturalWidth, simg_element.naturalHeight
+    simg = iu.convert_image_element simg_element, scale
+    console.log "simg.width = #{simg.width}, simg.height=#{simg.height}"
     dist = vit.gradient_dist simg, edge_sensitivity, uniform_bias
     result = vit.render_tiled_image simg, dist, numsamples
 
@@ -44,14 +51,7 @@ require ["ImageUtils"
     # Draw the tiled image
     rimg_element.src = iu.image_to_dataurl result.out
 
-  get_clamped_size = (w,h, mw=800, mh=600) ->
-    w_scale = mw / w
-    h_scale = mh / h
-    scale = Math.min(w_scale, h_scale)
-    if scale >= 1
-      return [w,h]
-    else
-      return [w*scale, h*scale]
+
 
   domReady ->
     fs = document.getElementById("fileselector")
