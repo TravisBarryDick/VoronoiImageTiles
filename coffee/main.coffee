@@ -32,11 +32,12 @@ require ["ImageUtils"
     numsamples = Math.floor(document.getElementById("numsamples").value)
     edge_sensitivity = Number(document.getElementById("edgesensitivity").value)
     uniform_bias = Number(document.getElementById("uniformbias").value)
+    max_width = Number(document.getElementById("maxwidth").value)
+    max_height = Number(document.getElementById("maxheight").value)
 
     # render the tiled image
-    scale = get_clamping_scale simg_element.naturalWidth, simg_element.naturalHeight
+    scale = get_clamping_scale simg_element.naturalWidth, simg_element.naturalHeight, max_width, max_height
     simg = iu.convert_image_element simg_element, scale
-    console.log "simg.width = #{simg.width}, simg.height=#{simg.height}"
     dist = vit.gradient_dist simg, edge_sensitivity, uniform_bias
     result = vit.render_tiled_image simg, dist, numsamples
 
