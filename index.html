@@ -1,0 +1,30 @@
+<html>
+
+<head>
+  <title> Voronoi Image Tiles </title>
+  <script data-main="js/main.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.min.js"></script>
+  <!-- Fallback in case requirejs CDN fails -->
+  <script>
+    if (typeof require == 'undefined') {
+      console.log("requirejs CDN failed, going to fallback!")
+      s = document.createElement("script")
+      s.setAttribute("data-main", "js/main.js")
+      s.setAttribute("src", "lib/require.js")
+      document.head.appendChild(s)
+    }
+  </script>
+</head>
+
+<body>
+  <div> Select an image file: <input id="fileselector" type="file" /> </div> <br/>
+  <div> Detail level: <input id="numsamples" type="range" min=100 max=10000 /> </div> <br/>
+  <button id="run_button" type="button"> Make tiled image! </button>
+  <div style="height:20px"> </div>
+  <div align="center">
+    <img id="sourceimage" style="width:30%"/>
+    <canvas id="kdtreegraph" style="width:30%"> </canvas>
+    <img id="resultimage" style="width:30%"/>
+  </div>
+</body>
+
+</html>
