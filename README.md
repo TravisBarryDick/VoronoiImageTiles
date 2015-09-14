@@ -5,12 +5,14 @@ A fun image processing project in javascript that is marginally related to my le
 ## Examples
 
 ### The Hubble 25-year Anniversary Photo
-![]("examples/hubble-25-year/original.jpg")
-![]("examples/hubble-25-year/result.png")
+![](examples/hubble-25-year/original.jpg)
+becomes
+![](examples/hubble-25-year/result.png)
 
 ### A shot of the mountains in Invermere, BC, Canada
-![]("examples/invermere-mountains/original.jpg")
-![]("examples/invermere-mountains/result.png")
+![](examples/invermere-mountains/original.jpg)
+becomes
+![](examples/invermere-mountains/result.png)
 
 ## How to Use
 
